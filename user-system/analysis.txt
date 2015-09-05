@@ -1,0 +1,101 @@
+design a twitter user system
+
+senario: user cases
+1. register/update/remove
+2. login/logout/remember me
+3. balance/membership
+
+necessary: system constraints
+total users = 100M
+daily active users = 1M
+after 3 months, dau = 1M * 2 = 2M;
+
+1. for traffic
+
+register
+predict
+assume 1% percent of users are new users, 
+estimate
+daily new register users = 2M * 0.01 = 20000;
+register qps = 2M * 0.01 / 86400 = 0.25q/s (very small)
+
+login
+predict
+assume 15% login(many users does not login such as youtube), 
+assume average login times = 1.2(failed + successful)
+estimate
+daily average login time = 2M * 0.15 * 1.2 = 360,000
+average login frequency = 360,000 / 86400 = 
+normal login frequency = average * 2
+peak login frequency = average * 10;
+
+2. for memoery
+
+
+3. for storage
+
+
+
+
+Application
+ignore the balance and membership 
+
+V1
+receptionist
+	|
+Account Service
+register
+update 
+remove
+login
+logout
+
+
+public class User {
+	int userId;
+	String name;
+	String password;
+	//ignore others
+}
+	
+public class UserTable {
+	Vector<User> table;
+	//CRUD
+	public boolean insertUser();
+	public boolean selectUser(int userId);
+	public boolean updateUser();
+	public boolean deleteUser();
+	
+}	
+
+
+V2
+support user management functions such as verification and ban
+important: use state lifecycle to represent workflow
+
+public class User{
+	int userId,
+	char(10) name; fixed length is easier to be queried
+	char(10) password; //hashed 
+	//String status;
+	int state;//unverified,active,inactive,banned,not existed; use int has better performance than string
+}
+
+public class UserTable {
+	Vector<User> table;
+	//CRUD
+	public boolean insertUser();
+	public boolean selectUser(int userId);
+	public boolean updateUser();
+	public boolean deleteUser();
+	//changed status
+	public boolean banUser();
+	public 
+}
+
+
+
+
+
+
+
