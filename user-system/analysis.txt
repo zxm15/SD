@@ -89,9 +89,198 @@ public class UserTable {
 	public boolean updateUser();
 	public boolean deleteUser();
 	//changed status
-	public boolean banUser();
-	public 
+	public boolean changeUserStatus();
 }
+
+
+V3
+support automatically logout after a period of time
+support multi-devices login
+
+use session with timestamp for auto logout and multi device login
+use device code to store what kind of device e.g. 1. mac 2. iphone 3 ipad, ...
+
+design a, create a list of sessions in user table
+
+public class User{
+	int userId,
+	char(10) name; fixed length is easier to be queried
+	char(10) password; //hashed 
+	//String status;
+	int state;//unverified,active,inactive,banned,not existed; use int has better performance than string
+	//session list
+	list<Session> sessionList;
+}
+
+public class Sessoin {
+	int sessionId;
+	int userId;
+	int deviceCode;
+	Time expiration;
+}
+
+public class UserTable {
+	Vector<User> table;
+	//CRUD
+	public boolean insertUser();
+	public boolean selectUser(int userId);
+	public boolean updateUser();
+	public boolean deleteUser();
+	//changed status
+	public boolean changeUserStatus();
+	
+}
+
+In above design, session was update frequently, list operation is not efficent.
+Instead, we could seperate sessions out and build its own table
+
+design b
+
+public class User{
+	int userId,
+	char(10) name; fixed length is easier to be queried
+	char(10) password; //hashed 
+	//String status;
+	int state;//unverified,active,inactive,banned,not existed; use int has better performance than string
+	
+}
+
+public class Sessoin {
+	int sessionId;
+	int userId;
+	int deviceCode;
+	Time expiration;
+}
+
+public class UserTable {
+	Vector<User> table;
+	//CRUD
+	public boolean insertUser();
+	public boolean selectUser(int userId);
+	public boolean updateUser();
+	public boolean deleteUser();
+	//changed status
+	public boolean changeUserStatus();
+	
+}
+
+
+public class SessionTable {
+	Vector<Session> table;
+	//CRUD
+	public boolean insertUser();
+	public boolean selectUser(int userId);
+	public boolean updateUser();
+	public boolean deleteUser();
+	
+}
+
+
+Advanced desgin.
+See similarity of two tables? Use inheritance
+
+public class Table {
+	Vector<Row> table; //Row is generic type
+	//CRUD
+	public boolean insertUser();
+	public boolean selectUser(int userId);
+	public boolean updateUser();
+	public boolean deleteUser();
+	
+}
+
+public class Row {
+	vector<Attributes> row; //common attributes shared by its subclasses
+}
+
+public class User extends Row {
+	char(10) name; fixed length is easier to be queried
+	char(10) password; //hashed 
+	int state;//unverified,active,inactive,banned,not existed; use int has better performance than string
+	
+}
+
+public class Session extends Row {
+	int userId;
+	int deviceCode;
+	Time expiration;
+}
+
+public class UserTable extends User {
+	
+}
+
+public class SessionTable extends Session {
+	
+}
+
+
+Design a payment system such as paypal
+
+senario: use cases (simplified)
+add money
+make payment
+
+necessary: system constraints
+Ask
+Total users = 100M
+dsu = 1M;
+users after three months 1M * 5 (high growth app) = 5M;
+
+for traffic(cpu and bandwidth):
+Predict
+50% dsu are using above use cases; they generate 5 transactions and 80% of them use make payment, 20% add money; 
+
+daily qps = 2M * 0.5 * 5 / 86400 = 58q/s
+peak qps = 58 * 5 = 290q/s
+
+for memory(memory):
+
+for storage(disk space):
+
+
+application: abstract design
+
+
+receptionist
+	|
+money service
+add money
+make payment
+
+
+kiolodata : data 
+
+public class User {
+	int userId;
+	Time expiration;
+}
+public class Money {
+	double balance;
+	int userId;
+	Time timestamp; //updated when balanced is changed.
+
+	public boolean addMoney(int amount) {...};
+	public boolean makePayment(int receiver) {...};
+}
+
+edges cases:
+what if a user made two payment at the time, according to different orders of handling request, the result could be very different. e.g.
+
+mp process
+a retrieve balance;
+b update subscription time;
+c update balance;
+
+mp1, mp2 at the same time
+mp1a
+mp1b
+mp2a
+mp2b
+mp1a
+mp2b
+
+result in buy two months useing one month money
 
 
 
