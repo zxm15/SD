@@ -18,7 +18,8 @@ public class Processor implements Runnable {
         solution = new ProducerAndConsumerWithConcurrentClasses();
     }
     public void produce() {
-        while (true) {
+        while (solution.getLatch().getCount() > 0) {
+            // while true will not be interrupted by latch await()
             int task = rand.nextInt(100);
             try {
                 solution.addTask(task);
@@ -34,7 +35,7 @@ public class Processor implements Runnable {
 
     public void consume() {
         //long count = ProducerAndConsumerWithConcurrentClasses.countDown();
-        while (true) {
+        while (solution.getLatch().getCount() > 0) {
             try {
                 Thread.sleep(100);
                 //System.out.println("Count is " + solution.getLatch().getCount());
